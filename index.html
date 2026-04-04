@@ -69,7 +69,8 @@ body::before{
   background:linear-gradient(175deg,rgba(200,215,222,.28),rgba(160,178,188,.18) 45%,rgba(220,232,238,.35));
   border:1px solid rgba(255,255,255,.35);
   box-shadow:inset 0 1px 1px rgba(255,255,255,.6),inset 0 -1px 1px rgba(0,0,0,.08),0 2px 8px rgba(60,75,90,.2);
-  transition:all .22s;
+  transition:transform .18s cubic-bezier(.34,1.56,.64,1), box-shadow .18s ease, background .18s ease;
+  cursor:pointer;
 }
 .gbtn::before{
   content:'';position:absolute;bottom:-10px;left:50%;transform:translateX(-50%);
@@ -82,10 +83,15 @@ body::before{
 }
 .gbtn:hover{
   background:linear-gradient(175deg,rgba(220,232,238,.38),rgba(180,196,206,.25) 45%,rgba(235,244,248,.42));
-  box-shadow:inset 0 1px 1px rgba(255,255,255,.7),inset 0 -1px 1px rgba(0,0,0,.06),0 4px 16px rgba(60,75,90,.28);
-  transform:translateY(-1px);
+  box-shadow:inset 0 1px 1px rgba(255,255,255,.7),inset 0 -1px 1px rgba(0,0,0,.06),0 8px 24px rgba(60,75,90,.32);
+  transform:translateY(-3px) scale(1.012);
 }
-.gbtn:active{transform:translateY(0);}
+.gbtn:active{
+  transform:scale(.96) translateY(2px);
+  box-shadow:inset 0 2px 6px rgba(45,60,75,.28),inset 0 -1px 1px rgba(255,255,255,.3),0 1px 4px rgba(60,75,90,.15);
+  background:linear-gradient(175deg,rgba(170,190,200,.32),rgba(140,160,172,.22) 45%,rgba(195,212,220,.38));
+  transition:transform .08s cubic-bezier(.34,1,.64,1), box-shadow .08s ease;
+}
 .btw{display:flex;flex-direction:column;align-items:flex-start;flex:1;position:relative;z-index:1;}
 .bl{font-size:1.1rem;font-weight:500;letter-spacing:.07em;color:rgba(255,255,255,.88);text-shadow:0 2px 8px rgba(0,0,0,.18),0 1px 0 rgba(255,255,255,.22);}
 .bu{font-size:.72rem;color:rgba(255,255,255,.4);letter-spacing:.03em;margin-top:2px;}
@@ -211,6 +217,17 @@ body::before{
 
 @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
 .shake{animation:shake .28s ease;}
+
+/* TOUCH BOUNCE */
+.gbtn.pressed{
+  transform:scale(.96) translateY(2px)!important;
+  box-shadow:inset 0 2px 6px rgba(45,60,75,.28),0 1px 4px rgba(60,75,90,.15)!important;
+  transition:transform .08s ease,box-shadow .08s ease!important;
+}
+.gbtn.bounce{
+  transform:translateY(-3px) scale(1.015)!important;
+  transition:transform .45s cubic-bezier(.34,1.6,.64,1),box-shadow .3s ease!important;
+}
 </style>
 </head>
 <body>
@@ -447,7 +464,11 @@ function renderFront() {
   if (!links.length) { el.innerHTML = '<div class="empty">尚無連結</div>'; return; }
   el.innerHTML = links.map(it => `
     <div class="groove">
-      <a class="gbtn" href="${esc(it.url)}" target="_blank" rel="noopener">
+      <a class="gbtn" href="${esc(it.url)}" target="_blank" rel="noopener"
+        onmousedown="this.style.transition='transform .08s cubic-bezier(.34,1,.64,1),box-shadow .08s ease'"
+        onmouseup="this.style.transition='transform .5s cubic-bezier(.34,1.56,.64,1),box-shadow .3s ease';this.style.transform='translateY(-2px) scale(1.008)';setTimeout(()=>{this.style.transform=''},400)"
+        ontouchstart="this.classList.add('pressed')"
+        ontouchend="this.classList.remove('pressed');this.classList.add('bounce');setTimeout(()=>this.classList.remove('bounce'),500)">
         <div class="btw">
           <span class="bl">${esc(it.label)}</span>
           <span class="bu">${esc(host(it.url))}</span>
