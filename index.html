@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Links</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{--c1:#7a8e9e;--c2:#96aab6;--c3:#8a9aa8;--sv:rgba(255,255,255,.88);}
+body{
+  min-height:100vh;
+  background:linear-gradient(135deg,var(--c1) 0%,var(--c2) 45%,var(--c3) 100%);
+  font-family:'Outfit',sans-serif;
+  display:flex;flex-direction:column;align-items:center;
+  padding:48px 20px 80px;overflow-x:hidden;
+}
+body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;
+  background:
+    radial-gradient(ellipse 60% 40% at 18% 18%,rgba(255,255,255,.13) 0%,transparent 60%),
+    radial-gradient(ellipse 40% 60% at 82% 82%,rgba(90,115,138,.18) 0%,transparent 60%);
+}
+.wrap{position:relative;z-index:1;width:100%;max-width:600px;}
+
+/* LOADING OVERLAY */
+#loadingOverlay{
+  position:fixed;inset:0;z-index:999;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;
+  background:linear-gradient(135deg,var(--c1),var(--c2) 45%,var(--c3));
+}
+.spinner{
+  width:36px;height:36px;border-radius:50%;
+  border:2px solid rgba(255,255,255,.15);
+  border-top-color:rgba(255,255,255,.7);
+  animation:spin .8s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+#loadingOverlay p{font-size:.85rem;color:rgba(255,255,255,.5);letter-spacing:.06em;}
+
+/* NOT CONFIGURED BANNER */
+#cfgBanner{
+  display:none;background:rgba(200,80,60,.35);border:1px solid rgba(255,150,130,.3);
+  border-radius:14px;padding:16px 20px;margin-bottom:24px;
+  font-size:.82rem;color:rgba(255,220,210,.9);letter-spacing:.03em;line-height:1.6;
+}
+
+/* HEADER */
+.hd{text-align:center;margin-bottom:40px;}
+#siteTitle{
+  font-size:2rem;font-weight:600;letter-spacing:.1em;color:var(--sv);
+  text-shadow:0 2px 12px rgba(0,0,0,.18),0 1px 0 rgba(255,255,255,.3);
+  cursor:pointer;display:inline-block;transition:opacity .2s;user-select:none;
+}
+#siteTitle:hover{opacity:.72;}
+#titleHint{font-size:.68rem;color:rgba(255,255,255,.35);letter-spacing:.08em;margin-top:5px;}
+#headerSub{font-size:.88rem;color:rgba(255,255,255,.48);letter-spacing:.04em;font-weight:300;margin-top:6px;}
+
+/* GLASS BUTTONS */
+.blist{display:flex;flex-direction:column;gap:18px;}
+.groove{
+  border-radius:60px;padding:6px;
+  background:linear-gradient(170deg,rgba(80,100,115,.38),rgba(130,150,162,.22));
+  box-shadow:inset 0 3px 8px rgba(45,60,75,.38),inset 0 -2px 6px rgba(255,255,255,.18),0 1px 0 rgba(255,255,255,.22);
+}
+.gbtn{
+  display:flex;align-items:center;width:100%;border-radius:52px;
+  padding:20px 32px;position:relative;overflow:hidden;text-decoration:none;
+  background:linear-gradient(175deg,rgba(200,215,222,.28),rgba(160,178,188,.18) 45%,rgba(220,232,238,.35));
+  border:1px solid rgba(255,255,255,.35);
+  box-shadow:inset 0 1px 1px rgba(255,255,255,.6),inset 0 -1px 1px rgba(0,0,0,.08),0 2px 8px rgba(60,75,90,.2);
+  transition:all .22s;
+}
+.gbtn::before{
+  content:'';position:absolute;bottom:-10px;left:50%;transform:translateX(-50%);
+  width:55%;height:55%;background:radial-gradient(ellipse,rgba(255,255,255,.55),transparent 70%);
+  pointer-events:none;
+}
+.gbtn::after{
+  content:'';position:absolute;top:0;left:8%;right:8%;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.75) 30%,rgba(255,255,255,.9) 50%,rgba(255,255,255,.75) 70%,transparent);
+}
+.gbtn:hover{
+  background:linear-gradient(175deg,rgba(220,232,238,.38),rgba(180,196,206,.25) 45%,rgba(235,244,248,.42));
+  box-shadow:inset 0 1px 1px rgba(255,255,255,.7),inset 0 -1px 1px rgba(0,0,0,.06),0 4px 16px rgba(60,75,90,.28);
+  transform:translateY(-1px);
+}
+.gbtn:active{transform:translateY(0);}
+.btw{display:flex;flex-direction:column;align-items:flex-start;flex:1;position:relative;z-index:1;}
+.bl{font-size:1.1rem;font-weight:500;letter-spacing:.07em;color:rgba(255,255,255,.88);text-shadow:0 2px 8px rgba(0,0,0,.18),0 1px 0 rgba(255,255,255,.22);}
+.bu{font-size:.72rem;color:rgba(255,255,255,.4);letter-spacing:.03em;margin-top:2px;}
+.empty{text-align:center;padding:48px 20px;color:rgba(255,255,255,.38);font-size:.9rem;font-weight:300;}
+
+/* SHARED PANEL */
+@keyframes mIn{from{transform:translateY(8px);opacity:0}to{transform:translateY(0);opacity:1}}
+.ipanel{
+  display:none;border-radius:20px;margin-bottom:28px;padding:32px;
+  background:rgba(50,65,80,.6);backdrop-filter:blur(12px);
+  border:1px solid rgba(255,255,255,.15);animation:mIn .22s ease;
+}
+.ipanel.on{display:block;}
+.spanel{
+  display:none;border-radius:16px;margin-top:14px;padding:22px 22px 16px;
+  background:rgba(45,60,75,.55);backdrop-filter:blur(10px);
+  border:1px solid rgba(255,255,255,.12);animation:mIn .2s ease;
+}
+.spanel.on{display:block;}
+.ptitle{font-size:1rem;font-weight:500;color:rgba(255,255,255,.9);letter-spacing:.07em;}
+.psub{font-size:.73rem;color:rgba(255,255,255,.38);margin:4px 0 18px;letter-spacing:.03em;}
+.field{margin-bottom:13px;}
+.field label{display:block;font-size:.7rem;color:rgba(255,255,255,.48);letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px;}
+.field input{
+  width:100%;padding:10px 14px;border-radius:10px;
+  border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.11);
+  color:rgba(255,255,255,.9);font-family:'Outfit',sans-serif;font-size:.9rem;
+  outline:none;transition:border-color .2s,background .2s;
+}
+.field input::placeholder{color:rgba(255,255,255,.28);}
+.field input:focus{border-color:rgba(255,255,255,.48);background:rgba(255,255,255,.18);}
+.err{font-size:.73rem;color:rgba(255,150,130,.95);min-height:18px;margin-top:5px;letter-spacing:.03em;}
+.rbtn{display:flex;gap:10px;margin-top:16px;}
+.mb{flex:1;padding:11px;border-radius:60px;border:none;cursor:pointer;font-family:'Outfit',sans-serif;font-size:.87rem;font-weight:500;letter-spacing:.05em;transition:all .18s;}
+.mb:disabled{opacity:.45;cursor:not-allowed;transform:none!important;}
+.mb.cc{background:rgba(255,255,255,.1);color:rgba(255,255,255,.55);border:1px solid rgba(255,255,255,.18);}
+.mb.cc:hover:not(:disabled){background:rgba(255,255,255,.18);}
+.mb.oo{
+  background:linear-gradient(155deg,rgba(255,255,255,.28),rgba(190,210,222,.22));
+  color:rgba(255,255,255,.9);border:1px solid rgba(255,255,255,.35);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 4px 12px rgba(0,0,0,.12);
+}
+.mb.oo:hover:not(:disabled){background:linear-gradient(155deg,rgba(255,255,255,.38),rgba(210,225,232,.28));transform:translateY(-1px);}
+
+/* ADMIN BAR */
+.abar{
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;
+  background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);
+  border-radius:16px;padding:12px 20px;margin-bottom:20px;backdrop-filter:blur(8px);
+}
+.ablabel{font-size:.8rem;letter-spacing:.1em;color:rgba(255,255,255,.6);font-weight:500;}
+.abacts{display:flex;gap:10px;flex-wrap:wrap;}
+.gsm{
+  display:flex;align-items:center;gap:7px;padding:9px 18px;
+  border:none;border-radius:60px;cursor:pointer;
+  font-family:'Outfit',sans-serif;font-size:.83rem;font-weight:500;letter-spacing:.05em;
+  color:var(--sv);
+  background:linear-gradient(160deg,rgba(255,255,255,.22),rgba(176,190,197,.15));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 4px 14px rgba(55,70,85,.22);
+  transition:all .2s;
+}
+.gsm:hover{background:linear-gradient(160deg,rgba(255,255,255,.3),rgba(176,190,197,.22));transform:translateY(-1px);}
+.gsm svg{width:14px;height:14px;flex-shrink:0;}
+.xbtn{
+  display:flex;align-items:center;gap:6px;padding:9px 14px;
+  border:1px solid rgba(255,255,255,.18);border-radius:60px;cursor:pointer;
+  font-family:'Outfit',sans-serif;font-size:.8rem;color:rgba(255,255,255,.55);
+  background:transparent;transition:all .2s;
+}
+.xbtn:hover{color:rgba(255,255,255,.85);border-color:rgba(255,255,255,.35);}
+.xbtn svg{width:13px;height:13px;}
+
+/* ADMIN LIST */
+.alist{display:flex;flex-direction:column;gap:9px;margin-top:4px;}
+.arow{
+  display:flex;align-items:center;gap:11px;
+  background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);
+  border-radius:15px;padding:13px 15px;transition:background .2s;cursor:default;
+}
+.arow:hover{background:rgba(255,255,255,.13);}
+.arow.drag{opacity:.3;}
+.dh{cursor:grab;color:rgba(255,255,255,.28);flex-shrink:0;}
+.dh:active{cursor:grabbing;}
+.dh svg{width:15px;height:15px;display:block;}
+.ainfo{flex:1;min-width:0;}
+.aname{font-size:.93rem;font-weight:500;color:rgba(255,255,255,.85);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.aurl{font-size:.7rem;color:rgba(255,255,255,.35);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.aacts{display:flex;gap:7px;flex-shrink:0;}
+.ib{
+  width:32px;height:32px;border-radius:50%;border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(255,255,255,.14);color:rgba(255,255,255,.72);transition:all .15s;
+}
+.ib:hover{background:rgba(255,255,255,.24);transform:scale(1.1);}
+.ib.del:hover{background:rgba(220,70,70,.4);}
+.ib svg{width:13px;height:13px;}
+
+/* SECTION CARDS */
+.scard{margin-top:16px;}
+.stoggle{
+  display:flex;align-items:center;justify-content:space-between;
+  width:100%;background:rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.14);border-radius:13px;
+  padding:14px 18px;cursor:pointer;
+  font-family:'Outfit',sans-serif;font-size:.85rem;font-weight:500;
+  color:rgba(255,255,255,.65);letter-spacing:.05em;transition:all .2s;
+}
+.stoggle:hover{background:rgba(255,255,255,.14);color:rgba(255,255,255,.9);}
+.stoggle .arr{font-size:.65rem;opacity:.55;transition:transform .2s;}
+.stoggle.on .arr{transform:rotate(180deg);}
+
+/* TEXT GROUPS */
+.tgrp{border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:14px 14px 4px;margin-bottom:14px;}
+.tgrp-label{font-size:.67rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:12px;}
+
+/* SAVING INDICATOR */
+.saving-dot{
+  display:inline-block;width:6px;height:6px;border-radius:50%;
+  background:rgba(120,220,150,.8);margin-left:8px;
+  animation:pulse 1.2s ease infinite;
+}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.shake{animation:shake .28s ease;}
+</style>
+</head>
+<body>
+
+<!-- LOADING OVERLAY -->
+<div id="loadingOverlay">
+  <div class="spinner"></div>
+  <p>載入中...</p>
+</div>
+
+<div class="wrap">
+
+  <!-- CONFIG BANNER (shows if Firebase not set up) -->
+  <div id="cfgBanner">
+    ⚠️ Firebase 尚未設定。請開啟 <strong>index.html</strong>，將 <code>firebaseConfig</code> 替換為你的 Firebase 專案設定，再重新部署。
+  </div>
+
+  <!-- HEADER -->
+  <div class="hd">
+    <div id="siteTitle" onclick="toggleLogin()">MY LINKS</div>
+    <div id="titleHint" style="display:none;">▲ 點擊標題進入後台管理</div>
+    <div id="headerSub">點擊按鈕前往連結</div>
+  </div>
+
+  <!-- LOGIN PANEL -->
+  <div class="ipanel" id="loginPanel">
+    <div class="ptitle" id="elLoginTitle">後台登入</div>
+    <div class="psub" id="elLoginSub">請輸入管理員密碼</div>
+    <div class="field">
+      <label id="elLoginLabel">密碼</label>
+      <input type="password" id="pwdInput" placeholder="輸入密碼" onkeydown="if(event.key==='Enter')checkPwd()">
+    </div>
+    <div class="err" id="pwdErr"></div>
+    <div class="rbtn" style="margin-top:12px;">
+      <button class="mb cc" onclick="closeLogin()">取消</button>
+      <button class="mb oo" id="elLoginBtn" onclick="checkPwd()">登入後台</button>
+    </div>
+  </div>
+
+  <!-- FRONT VIEW -->
+  <div id="frontView">
+    <div class="blist" id="btnList"></div>
+  </div>
+
+  <!-- ADMIN PANEL -->
+  <div id="adminView" style="display:none;">
+
+    <div class="abar">
+      <span class="ablabel" id="elAdminLabel">⚙ 後台管理模式</span>
+      <div class="abacts">
+        <button class="gsm" onclick="openEdit(-1)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/>
+          </svg>
+          <span id="elAddBtn">新增按鈕</span>
+        </button>
+        <button class="xbtn" onclick="exitAdmin()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+            <polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+          </svg>
+          <span id="elExitBtn">離開後台</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Add/Edit form -->
+    <div class="spanel" id="editPanel">
+      <div class="ptitle" id="editTitle">新增連結按鈕</div>
+      <div style="margin-top:14px;">
+        <div class="field"><label>按鈕名稱</label><input type="text" id="inLabel" placeholder="例如：我的部落格" maxlength="40" onkeydown="if(event.key==='Enter')saveLink()"></div>
+        <div class="field"><label>連結網址</label><input type="url" id="inUrl" placeholder="https://example.com" onkeydown="if(event.key==='Enter')saveLink()"></div>
+        <div class="rbtn" style="margin-top:12px;">
+          <button class="mb cc" onclick="closeEdit()">取消</button>
+          <button class="mb oo" id="saveLinkBtn" onclick="saveLink()">儲存</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="alist" id="adminList"></div>
+
+    <!-- 網站文字設定 -->
+    <div class="scard">
+      <button class="stoggle" id="txtBtn" onclick="toggleCard('txtPanel','txtBtn')">
+        <span>✦ 網站文字設定</span><span class="arr">▼</span>
+      </button>
+      <div class="spanel" id="txtPanel">
+        <div class="psub" style="margin-top:2px;">修改後點擊「儲存套用」即時更新，設定存於 Firebase</div>
+        <div class="tgrp">
+          <div class="tgrp-label">前台顯示</div>
+          <div class="field"><label>瀏覽器頁籤標題</label><input type="text" id="tPageTitle" placeholder="My Links" maxlength="50"></div>
+          <div class="field"><label>主標題（大字）</label><input type="text" id="tSiteTitle" placeholder="MY LINKS" maxlength="30"></div>
+          <div class="field"><label>副標題說明文字</label><input type="text" id="tFrontSub" placeholder="點擊按鈕前往連結" maxlength="60"></div>
+        </div>
+        <div class="tgrp">
+          <div class="tgrp-label">登入面板</div>
+          <div class="field"><label>面板標題</label><input type="text" id="tLoginTitle" placeholder="後台登入" maxlength="30"></div>
+          <div class="field"><label>說明文字</label><input type="text" id="tLoginSub" placeholder="請輸入管理員密碼" maxlength="40"></div>
+          <div class="field"><label>密碼欄位標籤</label><input type="text" id="tLoginLabel" placeholder="密碼" maxlength="20"></div>
+          <div class="field"><label>登入按鈕文字</label><input type="text" id="tLoginBtn" placeholder="登入後台" maxlength="20"></div>
+        </div>
+        <div class="tgrp">
+          <div class="tgrp-label">後台介面</div>
+          <div class="field"><label>後台狀態標籤</label><input type="text" id="tAdminLabel" placeholder="⚙ 後台管理模式" maxlength="30"></div>
+          <div class="field"><label>新增按鈕文字</label><input type="text" id="tAddBtn" placeholder="新增按鈕" maxlength="20"></div>
+          <div class="field"><label>離開後台按鈕文字</label><input type="text" id="tExitBtn" placeholder="離開後台" maxlength="20"></div>
+        </div>
+        <div class="rbtn" style="margin-top:8px;">
+          <button class="mb cc" onclick="toggleCard('txtPanel','txtBtn')">取消</button>
+          <button class="mb oo" id="saveTxtBtn" onclick="saveTxt()">儲存套用</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 變更後台密碼 -->
+    <div class="scard">
+      <button class="stoggle" id="pwdCBtn" onclick="toggleCard('pwdCPanel','pwdCBtn')">
+        <span>🔒 變更後台密碼</span><span class="arr">▼</span>
+      </button>
+      <div class="spanel" id="pwdCPanel">
+        <div style="margin-top:4px;">
+          <div class="field"><label>舊密碼</label><input type="password" id="oldPwd" placeholder="輸入舊密碼"></div>
+          <div class="field"><label>新密碼</label><input type="password" id="newPwd" placeholder="輸入新密碼"></div>
+          <div class="field"><label>確認新密碼</label><input type="password" id="cfmPwd" placeholder="再次輸入新密碼"></div>
+          <div class="err" id="pwdCErr"></div>
+          <div class="rbtn" style="margin-top:8px;">
+            <button class="mb cc" onclick="toggleCard('pwdCPanel','pwdCBtn')">取消</button>
+            <button class="mb oo" id="changePwdBtn" onclick="changePwd()">確認變更</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /adminView -->
+</div>
+
+<!-- Firebase SDK v10 compat -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+<script>
+/* ══════════════════════════════════════════
+   🔥 FIREBASE 設定 — 請替換成你自己的設定
+   ══════════════════════════════════════════ */
+const firebaseConfig = {
+  apiKey:            "AIzaSyARG3Ts7qLWElAuts3w5m1Fien3gDOvCBA",
+  authDomain:        "link-5117d.firebaseapp.com",
+  projectId:         "link-5117d",
+  storageBucket:     "link-5117d.firebasestorage.app",
+  messagingSenderId: "434964048778",
+  appId:             "1:434964048778:web:1fe46da0088a449a547673"
+};
+/* ══════════════════════════════════════════ */
+
+/* DEFAULTS */
+const DTEXT = {
+  pageTitle:'My Links', siteTitle:'MY LINKS', frontSub:'點擊按鈕前往連結',
+  loginTitle:'後台登入', loginSub:'請輸入管理員密碼', loginLabel:'密碼', loginBtn:'登入後台',
+  adminLabel:'⚙ 後台管理模式', addBtn:'新增按鈕', exitBtn:'離開後台'
+};
+const DEFAULT_PWD = '0204';
+
+/* STATE */
+let links = [], editIdx = -1, dragFrom = -1;
+let textCfg = { ...DTEXT };
+let adminPwd = DEFAULT_PWD;
+let db = null;
+let isConfigured = false;
+
+/* ── INIT ── */
+async function init() {
+  // Check if still placeholder
+  if (firebaseConfig.apiKey.startsWith('REPLACE')) {
+    document.getElementById('cfgBanner').style.display = 'block';
+    document.getElementById('loadingOverlay').style.display = 'none';
+    renderFront();
+    return;
+  }
+
+  try {
+    firebase.initializeApp(firebaseConfig);
+    db = firebase.firestore();
+    isConfigured = true;
+    await loadAll();
+  } catch(e) {
+    console.error('Firebase init error:', e);
+    document.getElementById('cfgBanner').style.display = 'block';
+    renderFront();
+  } finally {
+    document.getElementById('loadingOverlay').style.display = 'none';
+  }
+}
+
+async function loadAll() {
+  // Load settings
+  const settingsRef = db.collection('config').doc('settings');
+  const settingsDoc = await settingsRef.get();
+
+  if (settingsDoc.exists) {
+    const data = settingsDoc.data();
+    adminPwd = data.password || DEFAULT_PWD;
+    textCfg = { ...DTEXT };
+    Object.keys(DTEXT).forEach(k => { if (data[k]) textCfg[k] = data[k]; });
+  } else {
+    // First run — create defaults in Firestore
+    await settingsRef.set({ ...DTEXT, password: DEFAULT_PWD });
+    adminPwd = DEFAULT_PWD;
+    textCfg = { ...DTEXT };
+  }
+
+  // Load links
+  const linksSnap = await db.collection('links').orderBy('order').get();
+  links = linksSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+  applyTxt();
+  renderFront();
+}
+
+/* ── UTIL ── */
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function host(u){ try{ return new URL(u).hostname; } catch(e){ return u; } }
+function setLoading(btnId, loading) {
+  const b = document.getElementById(btnId);
+  if (!b) return;
+  b.disabled = loading;
+  if (loading) b.innerHTML = '<span class="saving-dot"></span> 儲存中...';
+}
+
+/* ── APPLY TEXT ── */
+function applyTxt() {
+  document.title = textCfg.pageTitle;
+  document.getElementById('siteTitle').textContent = textCfg.siteTitle;
+  document.getElementById('headerSub').textContent = textCfg.frontSub;
+  document.getElementById('elLoginTitle').textContent = textCfg.loginTitle;
+  document.getElementById('elLoginSub').textContent = textCfg.loginSub;
+  document.getElementById('elLoginLabel').textContent = textCfg.loginLabel;
+  document.getElementById('elLoginBtn').textContent = textCfg.loginBtn;
+  document.getElementById('elAdminLabel').textContent = textCfg.adminLabel;
+  document.getElementById('elAddBtn').textContent = textCfg.addBtn;
+  document.getElementById('elExitBtn').textContent = textCfg.exitBtn;
+}
+
+/* ── RENDER FRONT ── */
+function renderFront() {
+  const el = document.getElementById('btnList');
+  if (!links.length) { el.innerHTML = '<div class="empty">尚無連結</div>'; return; }
+  el.innerHTML = links.map(it => `
+    <div class="groove">
+      <a class="gbtn" href="${esc(it.url)}" target="_blank" rel="noopener">
+        <div class="btw">
+          <span class="bl">${esc(it.label)}</span>
+          <span class="bu">${esc(host(it.url))}</span>
+        </div>
+      </a>
+    </div>`).join('');
+}
+
+/* ── RENDER ADMIN ── */
+function renderAdmin() {
+  const el = document.getElementById('adminList');
+  if (!links.length) { el.innerHTML = '<div class="empty" style="padding:20px 0;">尚無連結</div>'; return; }
+  el.innerHTML = links.map((it, i) => `
+    <div class="arow" draggable="true"
+      ondragstart="ds(event,${i})" ondragover="dv(event)" ondrop="dp(event,${i})" ondragend="de()">
+      <div class="dh"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="8" y1="18" x2="16" y2="18"/>
+      </svg></div>
+      <div class="ainfo">
+        <div class="aname">${esc(it.label)}</div>
+        <div class="aurl">${esc(host(it.url))}</div>
+      </div>
+      <div class="aacts">
+        <button class="ib" onclick="openEdit(${i})">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+          </svg>
+        </button>
+        <button class="ib del" onclick="delLink(${i})">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <polyline points="3 6 5 6 21 6"/>
+            <path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/>
+          </svg>
+        </button>
+      </div>
+    </div>`).join('');
+}
+
+/* ── LOGIN ── */
+function toggleLogin() {
+  const p = document.getElementById('loginPanel');
+  if (p.classList.contains('on')) { closeLogin(); return; }
+  document.getElementById('pwdErr').textContent = '';
+  document.getElementById('pwdInput').value = '';
+  p.classList.add('on');
+  setTimeout(() => document.getElementById('pwdInput').focus(), 60);
+}
+function closeLogin() { document.getElementById('loginPanel').classList.remove('on'); }
+function checkPwd() {
+  const v = document.getElementById('pwdInput').value;
+  if (v === adminPwd) { closeLogin(); enterAdmin(); }
+  else {
+    document.getElementById('pwdErr').textContent = '密碼錯誤，請重試';
+    const el = document.getElementById('pwdInput');
+    el.classList.add('shake');
+    setTimeout(() => el.classList.remove('shake'), 300);
+    el.value = ''; el.focus();
+  }
+}
+
+/* ── ADMIN MODE ── */
+function enterAdmin() {
+  document.getElementById('frontView').style.display = 'none';
+  document.getElementById('adminView').style.display = '';
+  document.getElementById('titleHint').style.display = 'block';
+  document.getElementById('headerSub').textContent = '後台管理模式';
+  renderAdmin();
+}
+function exitAdmin() {
+  document.getElementById('adminView').style.display = 'none';
+  document.getElementById('frontView').style.display = '';
+  document.getElementById('titleHint').style.display = 'none';
+  closeEdit();
+  applyTxt();
+  renderFront();
+}
+
+/* ── EDIT PANEL ── */
+function openEdit(idx) {
+  editIdx = idx;
+  document.getElementById('editTitle').textContent = idx >= 0 ? '編輯連結按鈕' : '新增連結按鈕';
+  document.getElementById('inLabel').value = idx >= 0 ? links[idx].label : '';
+  document.getElementById('inUrl').value = idx >= 0 ? links[idx].url : '';
+  document.getElementById('saveLinkBtn').textContent = '儲存';
+  document.getElementById('saveLinkBtn').disabled = false;
+  document.getElementById('editPanel').classList.add('on');
+  setTimeout(() => document.getElementById('inLabel').focus(), 60);
+}
+function closeEdit() { document.getElementById('editPanel').classList.remove('on'); editIdx = -1; }
+
+async function saveLink() {
+  const lb = document.getElementById('inLabel').value.trim();
+  let url = document.getElementById('inUrl').value.trim();
+  if (!lb) { document.getElementById('inLabel').focus(); return; }
+  if (!url) { document.getElementById('inUrl').focus(); return; }
+  if (!/^https?:\/\//i.test(url)) url = 'https://' + url;
+
+  document.getElementById('saveLinkBtn').disabled = true;
+  document.getElementById('saveLinkBtn').textContent = '儲存中...';
+
+  try {
+    if (!isConfigured) {
+      // Fallback: memory only
+      if (editIdx >= 0) links[editIdx] = { ...links[editIdx], label: lb, url };
+      else links.push({ id: Date.now().toString(), label: lb, url, order: links.length });
+    } else if (editIdx >= 0) {
+      await db.collection('links').doc(links[editIdx].id).update({ label: lb, url });
+      links[editIdx] = { ...links[editIdx], label: lb, url };
+    } else {
+      const maxOrder = links.length > 0 ? Math.max(...links.map(l => l.order || 0)) : -1;
+      const docRef = await db.collection('links').add({ label: lb, url, order: maxOrder + 1 });
+      links.push({ id: docRef.id, label: lb, url, order: maxOrder + 1 });
+    }
+    renderAdmin(); renderFront(); closeEdit();
+  } catch(e) {
+    console.error(e);
+    alert('儲存失敗，請檢查 Firebase 設定');
+    document.getElementById('saveLinkBtn').disabled = false;
+    document.getElementById('saveLinkBtn').textContent = '儲存';
+  }
+}
+
+async function delLink(i) {
+  if (!confirm('確定刪除「' + links[i].label + '」？')) return;
+  try {
+    if (isConfigured) await db.collection('links').doc(links[i].id).delete();
+    links.splice(i, 1);
+    renderAdmin(); renderFront();
+  } catch(e) { alert('刪除失敗'); }
+}
+
+/* ── DRAG SORT ── */
+function ds(e, i) {
+  dragFrom = i; e.dataTransfer.effectAllowed = 'move';
+  setTimeout(() => { const r = document.querySelectorAll('.arow'); if (r[i]) r[i].classList.add('drag'); }, 0);
+}
+function dv(e) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; }
+async function dp(e, to) {
+  e.preventDefault();
+  if (dragFrom < 0 || dragFrom === to) return;
+  const it = links.splice(dragFrom, 1)[0]; links.splice(to, 0, it);
+  renderAdmin(); renderFront();
+  if (isConfigured) {
+    try {
+      const batch = db.batch();
+      links.forEach((lnk, idx) => {
+        batch.update(db.collection('links').doc(lnk.id), { order: idx });
+      });
+      await batch.commit();
+    } catch(e) { console.error('Reorder save failed:', e); }
+  }
+}
+function de() { dragFrom = -1; document.querySelectorAll('.arow').forEach(r => r.classList.remove('drag')); }
+
+/* ── SECTION ACCORDION ── */
+function toggleCard(pid, bid) {
+  const p = document.getElementById(pid);
+  const b = document.getElementById(bid);
+  const opening = !p.classList.contains('on');
+  if (pid === 'txtPanel' && opening) fillTxtForm();
+  if (pid === 'pwdCPanel' && opening) {
+    document.getElementById('pwdCErr').textContent = '';
+    ['oldPwd','newPwd','cfmPwd'].forEach(id => document.getElementById(id).value = '');
+  }
+  p.classList.toggle('on'); b.classList.toggle('on');
+}
+
+/* ── TEXT SETTINGS ── */
+function fillTxtForm() {
+  document.getElementById('tPageTitle').value = textCfg.pageTitle;
+  document.getElementById('tSiteTitle').value = textCfg.siteTitle;
+  document.getElementById('tFrontSub').value = textCfg.frontSub;
+  document.getElementById('tLoginTitle').value = textCfg.loginTitle;
+  document.getElementById('tLoginSub').value = textCfg.loginSub;
+  document.getElementById('tLoginLabel').value = textCfg.loginLabel;
+  document.getElementById('tLoginBtn').value = textCfg.loginBtn;
+  document.getElementById('tAdminLabel').value = textCfg.adminLabel;
+  document.getElementById('tAddBtn').value = textCfg.addBtn;
+  document.getElementById('tExitBtn').value = textCfg.exitBtn;
+}
+
+async function saveTxt() {
+  const cfg = {
+    pageTitle:   document.getElementById('tPageTitle').value.trim()  || DTEXT.pageTitle,
+    siteTitle:   document.getElementById('tSiteTitle').value.trim()  || DTEXT.siteTitle,
+    frontSub:    document.getElementById('tFrontSub').value.trim()   || DTEXT.frontSub,
+    loginTitle:  document.getElementById('tLoginTitle').value.trim() || DTEXT.loginTitle,
+    loginSub:    document.getElementById('tLoginSub').value.trim()   || DTEXT.loginSub,
+    loginLabel:  document.getElementById('tLoginLabel').value.trim() || DTEXT.loginLabel,
+    loginBtn:    document.getElementById('tLoginBtn').value.trim()   || DTEXT.loginBtn,
+    adminLabel:  document.getElementById('tAdminLabel').value.trim() || DTEXT.adminLabel,
+    addBtn:      document.getElementById('tAddBtn').value.trim()     || DTEXT.addBtn,
+    exitBtn:     document.getElementById('tExitBtn').value.trim()    || DTEXT.exitBtn,
+  };
+
+  const btn = document.getElementById('saveTxtBtn');
+  btn.disabled = true; btn.textContent = '儲存中...';
+
+  try {
+    if (isConfigured) {
+      await db.collection('config').doc('settings').update(cfg);
+    }
+    textCfg = cfg;
+    applyTxt();
+    document.getElementById('headerSub').textContent = '後台管理模式';
+    toggleCard('txtPanel', 'txtBtn');
+  } catch(e) {
+    alert('儲存失敗');
+  } finally {
+    btn.disabled = false; btn.textContent = '儲存套用';
+  }
+}
+
+/* ── CHANGE PASSWORD ── */
+async function changePwd() {
+  const o = document.getElementById('oldPwd').value;
+  const n = document.getElementById('newPwd').value;
+  const c = document.getElementById('cfmPwd').value;
+  const err = document.getElementById('pwdCErr');
+  if (o !== adminPwd) { err.textContent = '舊密碼不正確'; return; }
+  if (!n) { err.textContent = '新密碼不能為空'; return; }
+  if (n !== c) { err.textContent = '兩次密碼不一致'; return; }
+
+  const btn = document.getElementById('changePwdBtn');
+  btn.disabled = true; btn.textContent = '儲存中...';
+
+  try {
+    if (isConfigured) await db.collection('config').doc('settings').update({ password: n });
+    adminPwd = n;
+    toggleCard('pwdCPanel', 'pwdCBtn');
+    alert('✓ 密碼已成功變更！新密碼：' + n);
+  } catch(e) { alert('儲存失敗'); }
+  finally { btn.disabled = false; btn.textContent = '確認變更'; }
+}
+
+/* ── ESC ── */
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Escape') return;
+  if (document.getElementById('txtPanel').classList.contains('on')) toggleCard('txtPanel','txtBtn');
+  else if (document.getElementById('pwdCPanel').classList.contains('on')) toggleCard('pwdCPanel','pwdCBtn');
+  else if (document.getElementById('editPanel').classList.contains('on')) closeEdit();
+  else if (document.getElementById('loginPanel').classList.contains('on')) closeLogin();
+  else if (document.getElementById('adminView').style.display !== 'none') exitAdmin();
+});
+
+/* ── START ── */
+init();
+</script>
+</body>
+</html>
