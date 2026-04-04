@@ -197,7 +197,28 @@ body::before{
 .ib.del:hover{background:rgba(220,70,70,.4);}
 .ib svg{width:13px;height:13px;}
 
-/* GEAR SECTIONS */
+/* PREVIEW DRAG WRAPPER */
+.preview-wrap{
+  display:flex;align-items:center;gap:10px;
+  margin-bottom:18px;cursor:default;
+  transition:opacity .15s, transform .15s;
+}
+.preview-wrap:last-child{margin-bottom:0;}
+.preview-drag-handle{
+  flex-shrink:0;width:28px;height:28px;
+  display:flex;align-items:center;justify-content:center;
+  cursor:grab;color:rgba(255,255,255,.35);
+  border-radius:50%;transition:color .15s,background .15s;
+}
+.preview-drag-handle:active{cursor:grabbing;}
+.preview-drag-handle:hover{color:rgba(255,255,255,.7);background:rgba(255,255,255,.1);}
+.preview-drag-handle svg{width:15px;height:15px;}
+.preview-wrap.preview-drag{opacity:.3;}
+.preview-wrap.preview-over{
+  transform:translateY(-3px);
+  outline:2px dashed rgba(255,255,255,.35);
+  border-radius:60px;
+}
 .gear-sec{padding:4px 0 8px;}
 .gear-sec-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
 .gear-sec-title{font-size:.78rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.45);}
@@ -600,19 +621,30 @@ function renderFront() {
     </div>`).join('');
 }
 
-/* ── RENDER ADMIN PREVIEW (read-only buttons below bar) ── */
+/* ── RENDER ADMIN PREVIEW (draggable buttons below bar) ── */
 function renderAdminPreview() {
   const el = document.getElementById('adminPreviewList');
   if (!el) return;
   if (!links.length) { el.innerHTML = '<div class="empty">尚無連結</div>'; return; }
-  el.innerHTML = links.map(it => `
-    <div class="groove${it.adminOnly?' admin-only':''}">
-      <a class="gbtn${it.adminOnly?' admin-only':''}" href="${esc(it.url)}" target="_blank" rel="noopener">
-        <div class="btw">
-          <span class="bl">${esc(it.label)}${it.adminOnly?'<span class="admin-only-badge">🔒 僅後台</span>':''}</span>
-          <span class="bu">${esc(host(it.url))}</span>
-        </div>
-      </a>
+  el.innerHTML = links.map((it, i) => `
+    <div class="preview-wrap" draggable="true" data-i="${i}"
+      ondragstart="pdStart(event,${i})"
+      ondragover="pdOver(event,${i})"
+      ondrop="pdDrop(event,${i})"
+      ondragend="pdEnd()">
+      <div class="preview-drag-handle" title="拖曳排序">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="8" y1="18" x2="16" y2="18"/>
+        </svg>
+      </div>
+      <div class="groove${it.adminOnly?' admin-only':''}" style="flex:1;">
+        <a class="gbtn${it.adminOnly?' admin-only':''}" href="${esc(it.url)}" target="_blank" rel="noopener">
+          <div class="btw">
+            <span class="bl">${esc(it.label)}${it.adminOnly?'<span class="admin-only-badge">🔒 僅後台</span>':''}</span>
+            <span class="bu">${esc(host(it.url))}</span>
+          </div>
+        </a>
+      </div>
     </div>`).join('');
 }
 function renderAdmin() {
@@ -842,6 +874,50 @@ async function dp(e, to) {
   }
 }
 function de() { dragFrom = -1; document.querySelectorAll('.arow').forEach(r => r.classList.remove('drag')); }
+
+/* ── PREVIEW DRAG SORT ── */
+let pDragFrom = -1;
+function pdStart(e, i) {
+  pDragFrom = i;
+  e.dataTransfer.effectAllowed = 'move';
+  setTimeout(() => {
+    const rows = document.querySelectorAll('.preview-wrap');
+    if (rows[i]) rows[i].classList.add('preview-drag');
+  }, 0);
+}
+function pdOver(e, i) {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  document.querySelectorAll('.preview-wrap').forEach((r, idx) => {
+    r.classList.toggle('preview-over', idx === i && idx !== pDragFrom);
+  });
+}
+async function pdDrop(e, to) {
+  e.preventDefault();
+  document.querySelectorAll('.preview-wrap').forEach(r => r.classList.remove('preview-over'));
+  if (pDragFrom < 0 || pDragFrom === to) return;
+  const it = links.splice(pDragFrom, 1)[0];
+  links.splice(to, 0, it);
+  renderAdminPreview();
+  renderAdmin();
+  renderFront();
+  if (isConfigured) {
+    try {
+      const batch = db.batch();
+      links.forEach((lnk, idx) => {
+        batch.update(db.collection('links').doc(lnk.id), { order: idx });
+      });
+      await batch.commit();
+    } catch(e) { console.error('Reorder save failed:', e); }
+  }
+}
+function pdEnd() {
+  pDragFrom = -1;
+  document.querySelectorAll('.preview-wrap').forEach(r => {
+    r.classList.remove('preview-drag');
+    r.classList.remove('preview-over');
+  });
+}
 
 /* ── SECTION ACCORDION ── */
 function toggleCard(pid, bid) {
