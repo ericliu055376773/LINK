@@ -228,6 +228,65 @@ body::before{
   transform:translateY(-1px) scale(1.006)!important;
   transition:transform .3s cubic-bezier(.25,1.2,.5,1),box-shadow .25s ease!important;
 }
+
+/* ADMIN-ONLY RED BUTTON */
+.groove.admin-only{
+  background:linear-gradient(170deg,rgba(140,60,60,.42),rgba(100,50,55,.28));
+  box-shadow:inset 0 3px 8px rgba(80,20,20,.4),inset 0 -2px 6px rgba(255,180,180,.12),0 1px 0 rgba(255,180,160,.2);
+}
+.gbtn.admin-only{
+  background:linear-gradient(175deg,rgba(200,130,130,.22),rgba(170,90,95,.15) 45%,rgba(210,150,148,.28));
+  border:1px solid rgba(220,140,140,.35);
+  box-shadow:inset 0 1px 1px rgba(255,200,200,.5),inset 0 -1px 1px rgba(0,0,0,.1),0 2px 8px rgba(100,30,30,.2);
+}
+.gbtn.admin-only .bl{color:rgba(255,210,210,.9);}
+.gbtn.admin-only .bu{color:rgba(255,180,180,.45);}
+.gbtn.admin-only::before{background:radial-gradient(ellipse,rgba(255,200,200,.45),transparent 70%);}
+.admin-only-badge{
+  display:inline-flex;align-items:center;gap:4px;
+  font-size:.6rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;
+  color:rgba(255,180,170,.8);background:rgba(180,60,60,.25);
+  border:1px solid rgba(220,120,120,.25);border-radius:20px;
+  padding:2px 8px;margin-left:8px;vertical-align:middle;
+}
+
+.arow.admin-only-row{
+  background:rgba(160,50,50,.15);border-color:rgba(200,100,100,.2);
+}
+.arow.admin-only-row:hover{background:rgba(160,50,50,.22);}
+.vis-toggle{
+  display:flex;align-items:center;gap:12px;
+  background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);
+  border-radius:12px;padding:12px 14px;cursor:pointer;
+  transition:background .18s;margin-bottom:4px;user-select:none;
+}
+.vis-toggle:hover{background:rgba(255,255,255,.13);}
+.vis-toggle.admin-mode{
+  background:rgba(180,60,60,.18);border-color:rgba(220,120,120,.25);
+}
+.vis-icon{
+  width:32px;height:32px;border-radius:50%;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(255,255,255,.12);color:rgba(255,255,255,.7);
+  transition:background .18s,color .18s;
+}
+.vis-icon svg{width:14px;height:14px;}
+.vis-toggle.admin-mode .vis-icon{background:rgba(180,60,60,.3);color:rgba(255,180,170,.9);}
+.vis-title{font-size:.85rem;font-weight:500;color:rgba(255,255,255,.85);letter-spacing:.03em;}
+.vis-sub{font-size:.7rem;color:rgba(255,255,255,.4);margin-top:2px;letter-spacing:.02em;}
+.vis-toggle.admin-mode .vis-title{color:rgba(255,200,195,.9);}
+.vis-toggle.admin-mode .vis-sub{color:rgba(255,170,160,.5);}
+.vis-pill{
+  margin-left:auto;flex-shrink:0;
+  font-size:.68rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;
+  padding:4px 10px;border-radius:20px;
+  background:rgba(255,255,255,.15);color:rgba(255,255,255,.7);
+  border:1px solid rgba(255,255,255,.2);transition:all .18s;
+}
+.vis-toggle.admin-mode .vis-pill{
+  background:rgba(180,60,60,.3);color:rgba(255,180,170,.9);
+  border-color:rgba(220,120,120,.3);
+}
 </style>
 </head>
 <body>
@@ -304,6 +363,18 @@ body::before{
       <div style="margin-top:14px;">
         <div class="field"><label>按鈕名稱</label><input type="text" id="inLabel" placeholder="例如：我的部落格" maxlength="40" onkeydown="if(event.key==='Enter')saveLink()"></div>
         <div class="field"><label>連結網址</label><input type="url" id="inUrl" placeholder="https://example.com" onkeydown="if(event.key==='Enter')saveLink()"></div>
+        <div class="vis-toggle" onclick="toggleVis()">
+          <div class="vis-icon" id="visIcon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+            </svg>
+          </div>
+          <div>
+            <div class="vis-title" id="visTitle">所有人可見</div>
+            <div class="vis-sub" id="visSub">前台訪客看得到此按鈕</div>
+          </div>
+          <div class="vis-pill" id="visPill">公開</div>
+        </div>
         <div class="rbtn" style="margin-top:12px;">
           <button class="mb cc" onclick="closeEdit()">取消</button>
           <button class="mb oo" id="saveLinkBtn" onclick="saveLink()">儲存</button>
@@ -461,8 +532,9 @@ function applyTxt() {
 /* ── RENDER FRONT ── */
 function renderFront() {
   const el = document.getElementById('btnList');
-  if (!links.length) { el.innerHTML = '<div class="empty">尚無連結</div>'; return; }
-  el.innerHTML = links.map(it => `
+  const visible = links.filter(it => !it.adminOnly);
+  if (!visible.length) { el.innerHTML = '<div class="empty">尚無連結</div>'; return; }
+  el.innerHTML = visible.map(it => `
     <div class="groove">
       <a class="gbtn" href="${esc(it.url)}" target="_blank" rel="noopener"
         onmousedown="this.style.transition='transform .06s ease,box-shadow .06s ease'"
@@ -482,13 +554,13 @@ function renderAdmin() {
   const el = document.getElementById('adminList');
   if (!links.length) { el.innerHTML = '<div class="empty" style="padding:20px 0;">尚無連結</div>'; return; }
   el.innerHTML = links.map((it, i) => `
-    <div class="arow" draggable="true"
+    <div class="arow${it.adminOnly?' admin-only-row':''}" draggable="true"
       ondragstart="ds(event,${i})" ondragover="dv(event)" ondrop="dp(event,${i})" ondragend="de()">
       <div class="dh"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
         <line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="8" y1="18" x2="16" y2="18"/>
       </svg></div>
       <div class="ainfo">
-        <div class="aname">${esc(it.label)}</div>
+        <div class="aname">${esc(it.label)}${it.adminOnly?'<span class="admin-only-badge">🔒 僅後台</span>':''}</div>
         <div class="aurl">${esc(host(it.url))}</div>
       </div>
       <div class="aacts">
@@ -505,7 +577,19 @@ function renderAdmin() {
           </svg>
         </button>
       </div>
-    </div>`).join('');
+    </div>`).join('') +
+    `<div style="margin-top:16px;">` +
+    links.filter(it=>it.adminOnly).map(it=>`
+    <div class="groove admin-only" style="margin-bottom:14px;">
+      <a class="gbtn admin-only" href="${esc(it.url)}" target="_blank" rel="noopener"
+        onmousedown="this.style.transition='transform .06s ease,box-shadow .06s ease'"
+        onmouseup="this.style.transition='transform .3s cubic-bezier(.25,1.2,.5,1),box-shadow .25s ease';this.style.transform='translateY(-1px) scale(1.005)';setTimeout(()=>{this.style.transform=''},300)">
+        <div class="btw">
+          <span class="bl">${esc(it.label)}</span>
+          <span class="bu">${esc(host(it.url))}</span>
+        </div>
+      </a>
+    </div>`).join('') + `</div>`;
 }
 
 /* ── LOGIN ── */
@@ -566,13 +650,56 @@ function exitAdmin() {
 }
 
 /* ── EDIT PANEL ── */
+let currentAdminOnly = false;
+
+function toggleVis() {
+  currentAdminOnly = !currentAdminOnly;
+  const tog = document.getElementById('visToggle');
+  const title = document.getElementById('visTitle');
+  const sub = document.getElementById('visSub');
+  const pill = document.getElementById('visPill');
+  const icon = document.getElementById('visIcon');
+  const eyeOpen = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`;
+  const eyeLock = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>`;
+  if (currentAdminOnly) {
+    document.querySelector('.vis-toggle').classList.add('admin-mode');
+    title.textContent = '僅後台可見';
+    sub.textContent = '前台訪客看不到，登入後才顯示';
+    pill.textContent = '私密';
+    icon.innerHTML = eyeLock;
+  } else {
+    document.querySelector('.vis-toggle').classList.remove('admin-mode');
+    title.textContent = '所有人可見';
+    sub.textContent = '前台訪客看得到此按鈕';
+    pill.textContent = '公開';
+    icon.innerHTML = eyeOpen;
+  }
+}
+
 function openEdit(idx) {
   editIdx = idx;
+  currentAdminOnly = idx >= 0 ? (links[idx].adminOnly || false) : false;
   document.getElementById('editTitle').textContent = idx >= 0 ? '編輯連結按鈕' : '新增連結按鈕';
   document.getElementById('inLabel').value = idx >= 0 ? links[idx].label : '';
   document.getElementById('inUrl').value = idx >= 0 ? links[idx].url : '';
   document.getElementById('saveLinkBtn').textContent = '儲存';
   document.getElementById('saveLinkBtn').disabled = false;
+  const tog = document.querySelector('.vis-toggle');
+  const eyeOpen = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`;
+  const eyeLock = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>`;
+  if (currentAdminOnly) {
+    tog.classList.add('admin-mode');
+    document.getElementById('visTitle').textContent = '僅後台可見';
+    document.getElementById('visSub').textContent = '前台訪客看不到，登入後才顯示';
+    document.getElementById('visPill').textContent = '私密';
+    document.getElementById('visIcon').innerHTML = eyeLock;
+  } else {
+    tog.classList.remove('admin-mode');
+    document.getElementById('visTitle').textContent = '所有人可見';
+    document.getElementById('visSub').textContent = '前台訪客看得到此按鈕';
+    document.getElementById('visPill').textContent = '公開';
+    document.getElementById('visIcon').innerHTML = eyeOpen;
+  }
   document.getElementById('editPanel').classList.add('on');
   setTimeout(() => document.getElementById('inLabel').focus(), 60);
 }
@@ -584,22 +711,22 @@ async function saveLink() {
   if (!lb) { document.getElementById('inLabel').focus(); return; }
   if (!url) { document.getElementById('inUrl').focus(); return; }
   if (!/^https?:\/\//i.test(url)) url = 'https://' + url;
+  const adminOnly = currentAdminOnly;
 
   document.getElementById('saveLinkBtn').disabled = true;
   document.getElementById('saveLinkBtn').textContent = '儲存中...';
 
   try {
     if (!isConfigured) {
-      // Fallback: memory only
-      if (editIdx >= 0) links[editIdx] = { ...links[editIdx], label: lb, url };
-      else links.push({ id: Date.now().toString(), label: lb, url, order: links.length });
+      if (editIdx >= 0) links[editIdx] = { ...links[editIdx], label: lb, url, adminOnly };
+      else links.push({ id: Date.now().toString(), label: lb, url, adminOnly, order: links.length });
     } else if (editIdx >= 0) {
-      await db.collection('links').doc(links[editIdx].id).update({ label: lb, url });
-      links[editIdx] = { ...links[editIdx], label: lb, url };
+      await db.collection('links').doc(links[editIdx].id).update({ label: lb, url, adminOnly });
+      links[editIdx] = { ...links[editIdx], label: lb, url, adminOnly };
     } else {
       const maxOrder = links.length > 0 ? Math.max(...links.map(l => l.order || 0)) : -1;
-      const docRef = await db.collection('links').add({ label: lb, url, order: maxOrder + 1 });
-      links.push({ id: docRef.id, label: lb, url, order: maxOrder + 1 });
+      const docRef = await db.collection('links').add({ label: lb, url, adminOnly, order: maxOrder + 1 });
+      links.push({ id: docRef.id, label: lb, url, adminOnly, order: maxOrder + 1 });
     }
     renderAdmin(); renderFront(); closeEdit();
   } catch(e) {
