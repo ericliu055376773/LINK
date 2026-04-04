@@ -164,7 +164,15 @@ body::before{
 .xbtn:hover{color:rgba(255,255,255,.85);border-color:rgba(255,255,255,.35);}
 .xbtn svg{width:13px;height:13px;}
 
-/* ADMIN LIST */
+.gear-btn{
+  width:38px;height:38px;border-radius:50%;border:1px solid rgba(255,255,255,.18);
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  background:rgba(255,255,255,.1);color:rgba(255,255,255,.65);
+  transition:all .2s;flex-shrink:0;
+}
+.gear-btn:hover{background:rgba(255,255,255,.22);color:rgba(255,255,255,.9);transform:rotate(30deg);}
+.gear-btn.on{background:rgba(255,255,255,.22);color:rgba(255,255,255,.9);transform:rotate(60deg);}
+.gear-btn svg{width:16px;height:16px;}
 .alist{display:flex;flex-direction:column;gap:9px;margin-top:4px;}
 .arow{
   display:flex;align-items:center;gap:11px;
@@ -347,6 +355,12 @@ body::before{
           </svg>
           <span id="elAddBtn">新增按鈕</span>
         </button>
+        <button class="gear-btn" onclick="toggleCard('txtPanel','txtBtn')" title="網站文字設定">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+          </svg>
+        </button>
         <button class="xbtn" onclick="exitAdmin()">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
             <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
@@ -354,6 +368,35 @@ body::before{
           </svg>
           <span id="elExitBtn">離開後台</span>
         </button>
+      </div>
+    </div>
+
+    <!-- 齒輪：網站文字設定 (opens below bar) -->
+    <div class="spanel" id="txtPanel">
+      <div class="ptitle">網站文字設定</div>
+      <div class="psub" style="margin-top:4px;">修改後點擊「儲存套用」即時更新，設定存於 Firebase</div>
+      <div class="tgrp" style="margin-top:14px;">
+        <div class="tgrp-label">前台顯示</div>
+        <div class="field"><label>瀏覽器頁籤標題</label><input type="text" id="tPageTitle" placeholder="My Links" maxlength="50"></div>
+        <div class="field"><label>主標題（大字）</label><input type="text" id="tSiteTitle" placeholder="MY LINKS" maxlength="30"></div>
+        <div class="field"><label>副標題說明文字</label><input type="text" id="tFrontSub" placeholder="點擊按鈕前往連結" maxlength="60"></div>
+      </div>
+      <div class="tgrp">
+        <div class="tgrp-label">登入面板</div>
+        <div class="field"><label>面板標題</label><input type="text" id="tLoginTitle" placeholder="後台登入" maxlength="30"></div>
+        <div class="field"><label>說明文字</label><input type="text" id="tLoginSub" placeholder="請輸入管理員密碼" maxlength="40"></div>
+        <div class="field"><label>密碼欄位標籤</label><input type="text" id="tLoginLabel" placeholder="密碼" maxlength="20"></div>
+        <div class="field"><label>登入按鈕文字</label><input type="text" id="tLoginBtn" placeholder="登入後台" maxlength="20"></div>
+      </div>
+      <div class="tgrp">
+        <div class="tgrp-label">後台介面</div>
+        <div class="field"><label>後台狀態標籤</label><input type="text" id="tAdminLabel" placeholder="⚙ 後台管理模式" maxlength="30"></div>
+        <div class="field"><label>新增按鈕文字</label><input type="text" id="tAddBtn" placeholder="新增按鈕" maxlength="20"></div>
+        <div class="field"><label>離開後台按鈕文字</label><input type="text" id="tExitBtn" placeholder="離開後台" maxlength="20"></div>
+      </div>
+      <div class="rbtn" style="margin-top:8px;">
+        <button class="mb cc" onclick="toggleCard('txtPanel','txtBtn')">取消</button>
+        <button class="mb oo" id="saveTxtBtn" onclick="saveTxt()">儲存套用</button>
       </div>
     </div>
 
@@ -383,39 +426,6 @@ body::before{
     </div>
 
     <div class="alist" id="adminList"></div>
-
-    <!-- 網站文字設定 -->
-    <div class="scard">
-      <button class="stoggle" id="txtBtn" onclick="toggleCard('txtPanel','txtBtn')">
-        <span>✦ 網站文字設定</span><span class="arr">▼</span>
-      </button>
-      <div class="spanel" id="txtPanel">
-        <div class="psub" style="margin-top:2px;">修改後點擊「儲存套用」即時更新，設定存於 Firebase</div>
-        <div class="tgrp">
-          <div class="tgrp-label">前台顯示</div>
-          <div class="field"><label>瀏覽器頁籤標題</label><input type="text" id="tPageTitle" placeholder="My Links" maxlength="50"></div>
-          <div class="field"><label>主標題（大字）</label><input type="text" id="tSiteTitle" placeholder="MY LINKS" maxlength="30"></div>
-          <div class="field"><label>副標題說明文字</label><input type="text" id="tFrontSub" placeholder="點擊按鈕前往連結" maxlength="60"></div>
-        </div>
-        <div class="tgrp">
-          <div class="tgrp-label">登入面板</div>
-          <div class="field"><label>面板標題</label><input type="text" id="tLoginTitle" placeholder="後台登入" maxlength="30"></div>
-          <div class="field"><label>說明文字</label><input type="text" id="tLoginSub" placeholder="請輸入管理員密碼" maxlength="40"></div>
-          <div class="field"><label>密碼欄位標籤</label><input type="text" id="tLoginLabel" placeholder="密碼" maxlength="20"></div>
-          <div class="field"><label>登入按鈕文字</label><input type="text" id="tLoginBtn" placeholder="登入後台" maxlength="20"></div>
-        </div>
-        <div class="tgrp">
-          <div class="tgrp-label">後台介面</div>
-          <div class="field"><label>後台狀態標籤</label><input type="text" id="tAdminLabel" placeholder="⚙ 後台管理模式" maxlength="30"></div>
-          <div class="field"><label>新增按鈕文字</label><input type="text" id="tAddBtn" placeholder="新增按鈕" maxlength="20"></div>
-          <div class="field"><label>離開後台按鈕文字</label><input type="text" id="tExitBtn" placeholder="離開後台" maxlength="20"></div>
-        </div>
-        <div class="rbtn" style="margin-top:8px;">
-          <button class="mb cc" onclick="toggleCard('txtPanel','txtBtn')">取消</button>
-          <button class="mb oo" id="saveTxtBtn" onclick="saveTxt()">儲存套用</button>
-        </div>
-      </div>
-    </div>
 
     <!-- 變更密碼請至 Firebase Console -->
 
@@ -776,10 +786,12 @@ function toggleCard(pid, bid) {
   const opening = !p.classList.contains('on');
   if (pid === 'txtPanel' && opening) fillTxtForm();
   if (pid === 'pwdCPanel' && opening) {
-    document.getElementById('pwdCErr').textContent = '';
-    ['oldPwd','newPwd','cfmPwd'].forEach(id => document.getElementById(id).value = '');
+    const errEl = document.getElementById('pwdCErr');
+    if (errEl) errEl.textContent = '';
+    ['oldPwd','newPwd','cfmPwd'].forEach(id => { const el = document.getElementById(id); if(el) el.value=''; });
   }
-  p.classList.toggle('on'); b.classList.toggle('on');
+  p.classList.toggle('on');
+  if (b) b.classList.toggle('on');
 }
 
 /* ── TEXT SETTINGS ── */
