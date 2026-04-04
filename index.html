@@ -197,7 +197,28 @@ body::before{
 .ib.del:hover{background:rgba(220,70,70,.4);}
 .ib svg{width:13px;height:13px;}
 
-/* SECTION CARDS */
+/* GEAR SECTIONS */
+.gear-sec{padding:4px 0 8px;}
+.gear-sec-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.gear-sec-title{font-size:.78rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.45);}
+.gear-add-btn{
+  display:flex;align-items:center;gap:6px;padding:7px 14px;
+  border:1px solid rgba(255,255,255,.22);border-radius:60px;cursor:pointer;
+  font-family:'Outfit',sans-serif;font-size:.8rem;font-weight:500;letter-spacing:.04em;
+  color:rgba(255,255,255,.75);background:rgba(255,255,255,.1);
+  transition:all .18s;
+}
+.gear-add-btn:hover{background:rgba(255,255,255,.2);color:rgba(255,255,255,.95);}
+.gear-add-btn svg{width:13px;height:13px;}
+.gear-divider{border:none;border-top:1px solid rgba(255,255,255,.1);margin:20px 0;}
+.inner-panel{
+  display:none;border-radius:14px;padding:18px;margin-bottom:14px;
+  background:rgba(40,55,70,.5);border:1px solid rgba(255,255,255,.1);
+  animation:mIn .18s ease;
+}
+.inner-panel.on{display:block;}
+
+/* SECTION CARD (kept for compat) */
 .scard{margin-top:16px;}
 .stoggle{
   display:flex;align-items:center;justify-content:space-between;
@@ -346,16 +367,11 @@ body::before{
   <!-- ADMIN PANEL -->
   <div id="adminView" style="display:none;">
 
+    <!-- Admin bar: only label + gear + exit -->
     <div class="abar">
       <span class="ablabel" id="elAdminLabel">⚙ 後台管理模式</span>
       <div class="abacts">
-        <button class="gsm" onclick="openEdit(-1)">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/>
-          </svg>
-          <span id="elAddBtn">新增按鈕</span>
-        </button>
-        <button class="gear-btn" onclick="toggleCard('txtPanel','txtBtn')" title="網站文字設定">
+        <button class="gear-btn" id="txtBtn" onclick="toggleCard('txtPanel','txtBtn')" title="管理設定">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
             <circle cx="12" cy="12" r="3"/>
             <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
@@ -371,63 +387,84 @@ body::before{
       </div>
     </div>
 
-    <!-- 齒輪：網站文字設定 (opens below bar) -->
+    <!-- ════ GEAR PANEL ════ -->
     <div class="spanel" id="txtPanel">
-      <div class="ptitle">網站文字設定</div>
-      <div class="psub" style="margin-top:4px;">修改後點擊「儲存套用」即時更新，設定存於 Firebase</div>
-      <div class="tgrp" style="margin-top:14px;">
-        <div class="tgrp-label">前台顯示</div>
-        <div class="field"><label>瀏覽器頁籤標題</label><input type="text" id="tPageTitle" placeholder="My Links" maxlength="50"></div>
-        <div class="field"><label>主標題（大字）</label><input type="text" id="tSiteTitle" placeholder="MY LINKS" maxlength="30"></div>
-        <div class="field"><label>副標題說明文字</label><input type="text" id="tFrontSub" placeholder="點擊按鈕前往連結" maxlength="60"></div>
-      </div>
-      <div class="tgrp">
-        <div class="tgrp-label">登入面板</div>
-        <div class="field"><label>面板標題</label><input type="text" id="tLoginTitle" placeholder="後台登入" maxlength="30"></div>
-        <div class="field"><label>說明文字</label><input type="text" id="tLoginSub" placeholder="請輸入管理員密碼" maxlength="40"></div>
-        <div class="field"><label>密碼欄位標籤</label><input type="text" id="tLoginLabel" placeholder="密碼" maxlength="20"></div>
-        <div class="field"><label>登入按鈕文字</label><input type="text" id="tLoginBtn" placeholder="登入後台" maxlength="20"></div>
-      </div>
-      <div class="tgrp">
-        <div class="tgrp-label">後台介面</div>
-        <div class="field"><label>後台狀態標籤</label><input type="text" id="tAdminLabel" placeholder="⚙ 後台管理模式" maxlength="30"></div>
-        <div class="field"><label>新增按鈕文字</label><input type="text" id="tAddBtn" placeholder="新增按鈕" maxlength="20"></div>
-        <div class="field"><label>離開後台按鈕文字</label><input type="text" id="tExitBtn" placeholder="離開後台" maxlength="20"></div>
-      </div>
-      <div class="rbtn" style="margin-top:8px;">
-        <button class="mb cc" onclick="toggleCard('txtPanel','txtBtn')">取消</button>
-        <button class="mb oo" id="saveTxtBtn" onclick="saveTxt()">儲存套用</button>
-      </div>
-    </div>
 
-    <!-- Add/Edit form -->
-    <div class="spanel" id="editPanel">
-      <div class="ptitle" id="editTitle">新增連結按鈕</div>
-      <div style="margin-top:14px;">
-        <div class="field"><label>按鈕名稱</label><input type="text" id="inLabel" placeholder="例如：我的部落格" maxlength="40" onkeydown="if(event.key==='Enter')saveLink()"></div>
-        <div class="field"><label>連結網址</label><input type="url" id="inUrl" placeholder="https://example.com" onkeydown="if(event.key==='Enter')saveLink()"></div>
-        <div class="vis-toggle" onclick="toggleVis()">
-          <div class="vis-icon" id="visIcon">
+      <!-- ── 連結管理 ── -->
+      <div class="gear-sec">
+        <div class="gear-sec-hd">
+          <span class="gear-sec-title">連結管理</span>
+          <button class="gear-add-btn" onclick="openEdit(-1)" id="elAddBtn">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+              <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
             </svg>
-          </div>
-          <div>
-            <div class="vis-title" id="visTitle">所有人可見</div>
-            <div class="vis-sub" id="visSub">前台訪客看得到此按鈕</div>
-          </div>
-          <div class="vis-pill" id="visPill">公開</div>
+            新增按鈕
+          </button>
         </div>
-        <div class="rbtn" style="margin-top:12px;">
-          <button class="mb cc" onclick="closeEdit()">取消</button>
-          <button class="mb oo" id="saveLinkBtn" onclick="saveLink()">儲存</button>
+
+        <!-- Edit / Add form -->
+        <div class="inner-panel" id="editPanel">
+          <div class="ptitle" id="editTitle">新增連結按鈕</div>
+          <div style="margin-top:12px;">
+            <div class="field"><label>按鈕名稱</label><input type="text" id="inLabel" placeholder="例如：我的部落格" maxlength="40" onkeydown="if(event.key==='Enter')saveLink()"></div>
+            <div class="field"><label>連結網址</label><input type="url" id="inUrl" placeholder="https://example.com" onkeydown="if(event.key==='Enter')saveLink()"></div>
+            <div class="vis-toggle" onclick="toggleVis()">
+              <div class="vis-icon" id="visIcon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+                </svg>
+              </div>
+              <div>
+                <div class="vis-title" id="visTitle">所有人可見</div>
+                <div class="vis-sub" id="visSub">前台訪客看得到此按鈕</div>
+              </div>
+              <div class="vis-pill" id="visPill">公開</div>
+            </div>
+            <div class="rbtn" style="margin-top:10px;">
+              <button class="mb cc" onclick="closeEdit()">取消</button>
+              <button class="mb oo" id="saveLinkBtn" onclick="saveLink()">儲存</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Link list -->
+        <div class="alist" id="adminList"></div>
+      </div>
+
+      <!-- ── 分隔線 ── -->
+      <div class="gear-divider"></div>
+
+      <!-- ── 網站文字設定 ── -->
+      <div class="gear-sec">
+        <div class="gear-sec-hd">
+          <span class="gear-sec-title">網站文字設定</span>
+        </div>
+        <div class="psub" style="margin-bottom:14px;">修改後點擊「儲存套用」即時更新，設定存於 Firebase</div>
+        <div class="tgrp">
+          <div class="tgrp-label">前台顯示</div>
+          <div class="field"><label>瀏覽器頁籤標題</label><input type="text" id="tPageTitle" placeholder="My Links" maxlength="50"></div>
+          <div class="field"><label>主標題（大字）</label><input type="text" id="tSiteTitle" placeholder="MY LINKS" maxlength="30"></div>
+          <div class="field"><label>副標題說明文字</label><input type="text" id="tFrontSub" placeholder="點擊按鈕前往連結" maxlength="60"></div>
+        </div>
+        <div class="tgrp">
+          <div class="tgrp-label">登入面板</div>
+          <div class="field"><label>面板標題</label><input type="text" id="tLoginTitle" placeholder="後台登入" maxlength="30"></div>
+          <div class="field"><label>說明文字</label><input type="text" id="tLoginSub" placeholder="請輸入管理員密碼" maxlength="40"></div>
+          <div class="field"><label>密碼欄位標籤</label><input type="text" id="tLoginLabel" placeholder="密碼" maxlength="20"></div>
+          <div class="field"><label>登入按鈕文字</label><input type="text" id="tLoginBtn" placeholder="登入後台" maxlength="20"></div>
+        </div>
+        <div class="tgrp">
+          <div class="tgrp-label">後台介面</div>
+          <div class="field"><label>後台狀態標籤</label><input type="text" id="tAdminLabel" placeholder="⚙ 後台管理模式" maxlength="30"></div>
+          <div class="field"><label>離開後台按鈕文字</label><input type="text" id="tExitBtn" placeholder="離開後台" maxlength="20"></div>
+        </div>
+        <div class="rbtn" style="margin-top:8px;">
+          <button class="mb cc" onclick="toggleCard('txtPanel','txtBtn')">關閉</button>
+          <button class="mb oo" id="saveTxtBtn" onclick="saveTxt()">儲存套用</button>
         </div>
       </div>
-    </div>
 
-    <div class="alist" id="adminList"></div>
-
-    <!-- 變更密碼請至 Firebase Console -->
+    </div><!-- /gear panel -->
 
   </div><!-- /adminView -->
 </div>
@@ -710,8 +747,16 @@ function openEdit(idx) {
     document.getElementById('visPill').textContent = '公開';
     document.getElementById('visIcon').innerHTML = eyeOpen;
   }
+  // Auto-open gear panel if closed
+  const gearPanel = document.getElementById('txtPanel');
+  const gearBtn = document.getElementById('txtBtn');
+  if (!gearPanel.classList.contains('on')) {
+    gearPanel.classList.add('on');
+    if (gearBtn) gearBtn.classList.add('on');
+    fillTxtForm();
+  }
   document.getElementById('editPanel').classList.add('on');
-  setTimeout(() => document.getElementById('inLabel').focus(), 60);
+  setTimeout(() => document.getElementById('inLabel').focus(), 80);
 }
 function closeEdit() { document.getElementById('editPanel').classList.remove('on'); editIdx = -1; }
 
@@ -804,7 +849,6 @@ function fillTxtForm() {
   document.getElementById('tLoginLabel').value = textCfg.loginLabel;
   document.getElementById('tLoginBtn').value = textCfg.loginBtn;
   document.getElementById('tAdminLabel').value = textCfg.adminLabel;
-  document.getElementById('tAddBtn').value = textCfg.addBtn;
   document.getElementById('tExitBtn').value = textCfg.exitBtn;
 }
 
@@ -818,7 +862,6 @@ async function saveTxt() {
     loginLabel:  document.getElementById('tLoginLabel').value.trim() || DTEXT.loginLabel,
     loginBtn:    document.getElementById('tLoginBtn').value.trim()   || DTEXT.loginBtn,
     adminLabel:  document.getElementById('tAdminLabel').value.trim() || DTEXT.adminLabel,
-    addBtn:      document.getElementById('tAddBtn').value.trim()     || DTEXT.addBtn,
     exitBtn:     document.getElementById('tExitBtn').value.trim()    || DTEXT.exitBtn,
   };
 
